@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 
 namespace HybridChat
 {
@@ -26,6 +27,10 @@ namespace HybridChat
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            services.AddSwaggerGen(s =>
+                s.SwaggerDoc(name: "v1", new OpenApiInfo { Title = "HybridChat", Version = "v1"})
+            );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -35,6 +40,11 @@ namespace HybridChat
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseSwagger();
+            app.UseSwaggerUI(s => 
+                s.SwaggerEndpoint(url: "/swagger/v1/swagger.json", name: "HybridChat v1")
+            );
 
             app.UseHttpsRedirection();
 
