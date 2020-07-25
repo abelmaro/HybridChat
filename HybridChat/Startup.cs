@@ -1,15 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using HybridChat.Services;
+using HybridChat.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 
 namespace HybridChat
@@ -31,6 +26,8 @@ namespace HybridChat
             services.AddSwaggerGen(s =>
                 s.SwaggerDoc(name: "v1", new OpenApiInfo { Title = "HybridChat", Version = "v1"})
             );
+
+            services.AddScoped<IUserService, UserService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -42,8 +39,9 @@ namespace HybridChat
             }
 
             app.UseSwagger();
-            app.UseSwaggerUI(s => 
-                s.SwaggerEndpoint(url: "/swagger/v1/swagger.json", name: "HybridChat v1")
+            app.UseSwaggerUI(s => {
+                    s.SwaggerEndpoint(url: "/swagger/swagger/v1/swagger.json", name: "HybridChat v1");
+                }
             );
 
             app.UseHttpsRedirection();
