@@ -1,6 +1,7 @@
 ﻿using HybridChat.Data;
 using HybridChat.Entities;
 using HybridChat.Entities.DTO;
+using HybridChat.Hubs;
 using HybridChat.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -12,10 +13,16 @@ namespace HybridChat.Services
     public class MessageService : IMessageService
     {
         private readonly ChatContext _context;
+        private readonly IHybridChatHub _hub;
+        private readonly IUserService _userService;
 
-        public MessageService(ChatContext chatContext)
+        public MessageService(ChatContext chatContext,
+            IHybridChatHub hybridChatHub,
+            IUserService userService)
         {
             _context = chatContext;
+            _userService = userService;
+            _hub = hybridChatHub;
         }
 
         public List<MessageDto> GetMessages() {
@@ -45,10 +52,13 @@ namespace HybridChat.Services
                 MessageContent = message,
                 MessageId = Guid.NewGuid()
             };
+            UserDto username = new UserDto() {
+                Username = _userService.GetUserById(user).ToString()
+            };
 
              await _context.AddAsync(messageToAdd);
             _context.SaveChanges();
-
+            await _hub.SendMessageEvent(username.Username, message);
             return messageToAdd.MessageId;
         }
     }

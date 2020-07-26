@@ -1,8 +1,10 @@
 using HybridChat.Data;
+using HybridChat.Hubs;
 using HybridChat.Services;
 using HybridChat.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,9 +22,15 @@ namespace HybridChat
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
+            }));
+
             services.AddControllers();
 
             services.AddDbContext<ChatContext>(options =>
@@ -33,17 +41,21 @@ namespace HybridChat
                 s.SwaggerDoc(name: "v1", new OpenApiInfo { Title = "HybridChat", Version = "v1"})
             );
 
+            services.AddSignalR();
+
+            services.AddScoped<IHybridChatHub, HybridChatHub>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IMessageService, MessageService>();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseCors("MyPolicy");
 
             app.UseSwagger();
             app.UseSwaggerUI(s => {
@@ -60,6 +72,7 @@ namespace HybridChat
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<HybridChatHub>("/chathub");
             });
         }
     }

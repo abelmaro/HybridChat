@@ -1,5 +1,4 @@
-﻿using HybridChat.Entities;
-using HybridChat.Entities.DTO;
+﻿using HybridChat.Entities.DTO;
 using System;
 using System.Threading.Tasks;
 
