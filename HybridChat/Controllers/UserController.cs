@@ -1,4 +1,4 @@
-﻿using HybridChat.Entities;
+﻿using HybridChat.Entities.DTO;
 using HybridChat.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -16,14 +16,14 @@ namespace HybridChat.Controllers
 
         [HttpGet]
         public JsonResult GetUserById(Guid userId) {
-            Task<User> user = _userService.GetUserById(userId);
+            UserDto user = _userService.GetUserById(userId);
             return new JsonResult(user);
         }
 
-        [HttpPut]
-        public JsonResult CreateNewUser(string username)
+        [HttpPost]
+        public async Task<JsonResult> CreateNewUser(string username)
         {
-            return new JsonResult(_userService.CreateNewUser(username));
+            return new JsonResult(await _userService.CreateNewUser(username));
         }
     }
 }

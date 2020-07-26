@@ -15,7 +15,7 @@ namespace HybridChat.Controllers
         [HttpPut]
         public JsonResult SendMessage(Guid user, string message)
         {
-            return new JsonResult(_messageService.SendMessage(user, message));
+            return new JsonResult(_messageService.SendMessage(user, message).Result);
         }
 
         [HttpGet]

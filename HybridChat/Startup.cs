@@ -1,7 +1,9 @@
+using HybridChat.Data;
 using HybridChat.Services;
 using HybridChat.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -23,11 +25,16 @@ namespace HybridChat
         {
             services.AddControllers();
 
+            services.AddDbContext<ChatContext>(options =>
+                options.UseSqlServer(
+                    Configuration.GetConnectionString("HybridChat")));
+
             services.AddSwaggerGen(s =>
                 s.SwaggerDoc(name: "v1", new OpenApiInfo { Title = "HybridChat", Version = "v1"})
             );
 
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IMessageService, MessageService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
